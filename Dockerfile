@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend ./backend
 COPY frontend ./frontend
+COPY run.py ./run.py
 RUN mkdir -p /app/backend/data && chown -R app:app /app/backend/data
 
 USER app
