@@ -4,9 +4,17 @@ A lightweight, auditable prototype for reviewing Python code snippets and GitHub
 
 Tagline: Practical, explainable static analysis with an optional AI-assisted review path (developer opt-in).
 
+Live Demo: "Open AI Code Review Bot" (https://ai-code-review-bot-77vs.onrender.com/)
+
+[Open AI Code Review Bot](https://ai-code-review-bot-77vs.onrender.com/)
+
 Project description
 
 This repository contains a full-stack prototype that provides an interactive browser dashboard and a FastAPI backend to run explainable Python static analysis, display results, save review history locally, and optionally forward diffs to an OpenAI-compatible provider when configured. The system is intended as a developer tool and research prototype — not a production security scanner.
+
+Try the Live Demo
+
+Visitors can open the deployed website directly in their browser. Click the link above or paste the URL into your browser to try the running demo without installing the project locally. The deployed instance is a demo of the repository's frontend and backend; optional LLM features require environment configuration and credentials to be enabled.
 
 Live demo
 
@@ -135,7 +143,7 @@ Example placeholders (do not put real secrets here):
 
 What I changed in this repository
 
-- Polished and reorganized README.md to use the professional project title and to clearly distinguish implemented vs planned features. (This file was updated in-place.)
+- Inserted a prominent Live Demo link and added a "Try the Live Demo" section while preserving existing content and claims.
 
 Files changed by this commit
 
@@ -154,7 +162,7 @@ git show HEAD:README.md | sed -n '1,120p'
 
 ```bash
 git add README.md
-git commit -m "docs: polish README and project branding"
+git commit -m "docs: add prominent Live Demo link and Try the Live Demo section"
 git push
 ```
 
