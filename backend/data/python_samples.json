@@ -1,0 +1,20 @@
+[
+  {
+    "id": "mutable-default",
+    "title": "Potential bug — mutable default argument",
+    "category": "Potential bug",
+    "code": "def add_tag(tag, tags=[]):\n    tags.append(tag)\n    return tags\n\nprint(add_tag(\"review\"))\nprint(add_tag(\"python\"))\n"
+  },
+  {
+    "id": "dynamic-eval",
+    "title": "Insecure pattern — eval on input",
+    "category": "Security pattern",
+    "code": "def calculate(expression):\n    return eval(expression)\n\nprint(calculate(input(\"Expression: \")))\n"
+  },
+  {
+    "id": "clean-python",
+    "title": "Clean code — validated arithmetic",
+    "category": "Clean example",
+    "code": "def safe_average(values):\n    if not values:\n        return 0.0\n    return sum(values) / len(values)\n\nprint(safe_average([4, 6, 8]))\n"
+  }
+]

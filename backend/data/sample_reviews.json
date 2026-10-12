@@ -1,0 +1,130 @@
+[
+  {
+    "id": "python-api-validation",
+    "title": "Validate API input before database access",
+    "repository": "octo-labs/inventory-api",
+    "number": 42,
+    "author": "maya-dev",
+    "branch": "fix/request-validation",
+    "updated": "12 minutes ago",
+    "status": "Completed",
+    "summary": "The endpoint passes request data directly into a database query and does not handle a missing item.",
+    "score": 68,
+    "files": [
+      {
+        "filename": "app/routes/items.py",
+        "old": "def get_item(cursor, item_id):\n    cursor.execute(\"SELECT * FROM items WHERE id=\" + item_id)\n    return cursor.fetchone()\n",
+        "new": "def get_item(cursor, item_id):\n    cursor.execute(\"SELECT * FROM items WHERE id=%s\", (item_id,))\n    item = cursor.fetchone()\n    if item is None:\n        raise LookupError(\"Item not found\")\n    return item\n"
+      }
+    ],
+    "findings": [
+      {
+        "id": "s1",
+        "severity": "High",
+        "category": "Security",
+        "title": "Query uses string concatenation",
+        "file": "app/routes/items.py",
+        "line": 2,
+        "explanation": "The query is assembled by concatenating item_id into SQL instead of binding it as a parameter.",
+        "why_it_matters": "If item_id is attacker-controlled, crafted input could alter the query. This is a demo heuristic, not a verified exploit.",
+        "recommendation": "Use the database driver's parameterized-query interface and validate the identifier's expected type.",
+        "suggested_code": "cursor.execute(\"SELECT * FROM items WHERE id=%s\", (item_id,))",
+        "source": "Demo heuristic"
+      },
+      {
+        "id": "q1",
+        "severity": "Medium",
+        "category": "Reliability",
+        "title": "Missing item is returned without an explicit outcome",
+        "file": "app/routes/items.py",
+        "line": 3,
+        "explanation": "fetchone() can return None, but callers receive it without a documented not-found response.",
+        "why_it_matters": "Callers may fail later with a less useful error, obscuring the actual missing-resource condition.",
+        "recommendation": "Check for a missing row and return a deliberate 404 or raise the application's not-found exception.",
+        "suggested_code": "item = cursor.fetchone()\nif item is None:\n    raise LookupError(\"Item not found\")\nreturn item",
+        "source": "Demo heuristic"
+      }
+    ]
+  },
+  {
+    "id": "node-auth-logging",
+    "title": "Avoid logging authentication credentials",
+    "repository": "acme-co/session-service",
+    "number": 118,
+    "author": "dev-jordan",
+    "branch": "chore/auth-logging",
+    "updated": "48 minutes ago",
+    "status": "Completed",
+    "summary": "A debug log includes the submitted credential and request failures are not handled explicitly.",
+    "score": 54,
+    "files": [
+      {
+        "filename": "src/auth/login.js",
+        "old": "app.post('/login', async (req, res) => {\n  console.log('login', req.body);\n  const user = await authenticate(req.body.email, req.body.password);\n  res.json({ token: user.token });\n});\n",
+        "new": "app.post('/login', async (req, res) => {\n  try {\n    const user = await authenticate(req.body.email, req.body.password);\n    res.json({ token: user.token });\n  } catch (error) {\n    res.status(401).json({ error: 'Invalid credentials' });\n  }\n});\n"
+      }
+    ],
+    "findings": [
+      {
+        "id": "s2",
+        "severity": "Critical",
+        "category": "Security",
+        "title": "Request logging may expose credentials",
+        "file": "src/auth/login.js",
+        "line": 2,
+        "explanation": "The entire login request body is written to the application log, which can include a password.",
+        "why_it_matters": "Logs are often retained and broadly accessible; exposed credentials could enable account compromise. Demo data only; no live log was inspected.",
+        "recommendation": "Never log authentication fields. If request tracing is needed, record only a request ID and a carefully selected, non-secret field.",
+        "suggested_code": "logger.info('login attempt', { requestId: req.id });",
+        "source": "Demo heuristic"
+      },
+      {
+        "id": "q2",
+        "severity": "Medium",
+        "category": "Reliability",
+        "title": "Authentication failure needs a deliberate response",
+        "file": "src/auth/login.js",
+        "line": 3,
+        "explanation": "The asynchronous handler has no local failure handling for rejected authentication or downstream errors.",
+        "why_it_matters": "Depending on framework behavior, rejected promises may result in noisy logs or an inconsistent response.",
+        "recommendation": "Catch expected authentication failures and return a consistent status without leaking internal error details.",
+        "suggested_code": "try { /* authenticate */ } catch (error) { res.status(401).json({ error: 'Invalid credentials' }); }",
+        "source": "Demo heuristic"
+      }
+    ]
+  },
+  {
+    "id": "python-csv-streaming",
+    "title": "Stream large CSV exports",
+    "repository": "northstar/analytics-worker",
+    "number": 307,
+    "author": "sam-lee",
+    "branch": "perf/csv-export",
+    "updated": "2 hours ago",
+    "status": "Completed",
+    "summary": "The export builds the complete result set and output string in memory before writing it.",
+    "score": 81,
+    "files": [
+      {
+        "filename": "exports/report.py",
+        "old": "def write_report(rows, path):\n    content = \"\\n\".join(\",\".join(map(str, row)) for row in rows)\n    with open(path, \"w\") as report:\n        report.write(content)\n",
+        "new": "import csv\n\ndef write_report(rows, path):\n    with open(path, \"w\", newline=\"\", encoding=\"utf-8\") as report:\n        writer = csv.writer(report)\n        writer.writerows(rows)\n"
+      }
+    ],
+    "findings": [
+      {
+        "id": "p1",
+        "severity": "Low",
+        "category": "Performance",
+        "title": "The full export is materialized before it is written",
+        "file": "exports/report.py",
+        "line": 2,
+        "explanation": "Joining all rows creates a second large in-memory representation of the report.",
+        "why_it_matters": "For large exports, peak memory use grows with the total output size and can slow or interrupt the worker.",
+        "recommendation": "Use Python's csv module and write rows incrementally; confirm the input itself is also streamed if it can be large.",
+        "suggested_code": "writer = csv.writer(report)\nwriter.writerows(rows)",
+        "source": "Demo heuristic"
+      }
+    ]
+  }
+]

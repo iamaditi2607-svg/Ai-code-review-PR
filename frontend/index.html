@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1020">
+  <meta name="description" content="AI Code Review Bot (GitHub PR) reviews pull requests for bugs, security risks, and code quality.">
+  <title>AI Code Review Bot (GitHub PR)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="/" aria-label="AI Code Review Bot (GitHub PR) home">
+        <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5 27 8v7.2c0 7.1-4.6 11.2-11 13.3C9.6 26.4 5 22.3 5 15.2V8l11-4.5Z"/><path d="m11.2 15.8 3.1 3.1 6.7-7"/></svg></span>
+        <span class="brand-copy"><strong>AI Code Review</strong><small>BOT · GITHUB PR</small></span>
+      </a>
+      <div class="workspace-label">WORKSPACE</div>
+      <nav class="side-nav" aria-label="Main navigation">
+        <button class="nav-link is-active" data-view="dashboard"><span class="nav-icon">▦</span>Overview</button>
+        <button class="nav-link" data-view="reviews"><span class="nav-icon">⌘</span>Code reviews <span class="nav-count" id="review-nav-count">0</span></button>
+        <button class="nav-link" data-view="settings"><span class="nav-icon">⚙</span>Settings</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="plan-card">
+          <div class="plan-top"><span class="plan-gem">✦</span><span>DEMO WORKSPACE</span></div>
+          <p>Explore sample PRs or connect a GitHub repository to review a live diff.</p>
+          <button class="text-button" data-view="settings">Integration settings <span>→</span></button>
+        </div>
+        <div class="user-card"><div class="avatar">CS</div><div><strong>Developer</strong><small>Local workspace</small></div><span class="user-menu">···</span></div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button class="mobile-menu icon-button" id="mobile-menu" aria-label="Toggle navigation">☰</button>
+        <div class="breadcrumbs"><span>Workspace</span><span class="crumb-slash">/</span><strong id="breadcrumb-current">Overview</strong></div>
+        <div class="topbar-right"><span class="connection"><i></i><span id="connection-label">Connecting…</span></span><span class="top-avatar">AD</span></div>
+      </header>
+
+      <section class="page-view is-visible" id="view-dashboard">
+        <div class="page-heading">
+          <div><div class="eyebrow"><span id="current-date"></span> <span class="eyebrow-dot">●</span> YOUR ENGINEERING WORKSPACE</div><h1>Good evening, <span>developer.</span></h1><p class="subheading">Here’s the latest signal across your code reviews.</p></div>
+          <button class="button button-primary" id="new-review-button"><span>＋</span> New review</button>
+        </div>
+
+        <div class="demo-banner"><span class="banner-spark">◈</span><div><strong>Review workspace</strong><span id="demo-banner-copy">Dashboard counts are calculated from reviews saved on this instance. Bundled sample PRs are labeled demo data.</span></div><button data-view="settings">Configure integrations <span>→</span></button></div>
+
+        <section class="metric-grid" aria-label="Review metrics">
+          <article class="metric-card"><div class="metric-head"><span>Saved reviews</span><span class="metric-icon violet">⌕</span></div><div class="metric-value" id="metric-total">0</div><div class="metric-foot"><span class="trend neutral">On this instance</span></div><div class="metric-caption">Local review history</div></article>
+          <article class="metric-card"><div class="metric-head"><span>Recorded findings</span><span class="metric-icon orange">◈</span></div><div class="metric-value" id="metric-bugs">0</div><div class="metric-foot"><span class="trend neutral">Across saved reviews</span></div><div class="metric-caption">Suggestions, not verified defects</div></article>
+          <article class="metric-card"><div class="metric-head"><span>Python analyses</span><span class="metric-icon blue">⌘</span></div><div class="metric-value" id="metric-security">0</div><div class="metric-foot"><span class="trend neutral">AST rules</span></div><div class="metric-caption">Submitted code is never executed</div></article>
+          <article class="metric-card"><div class="metric-head"><span>GitHub PR reviews</span><span class="metric-icon violet">↗</span></div><div class="metric-value" id="metric-score">0</div><div class="metric-foot"><span class="trend neutral">Saved on this instance</span></div><div class="metric-caption">AI or labeled demo heuristic</div></article>
+        </section>
+
+        <div class="content-grid">
+          <section class="panel review-panel" id="review-form-panel">
+            <div class="panel-heading"><div><div class="panel-kicker">START A REVIEW</div><h2 id="review-form-title">Review Python code</h2><p>Explainable static checks for Python, or a read-only review of a GitHub pull request.</p></div><span class="heading-spark">✳</span></div>
+            <div class="mode-switch" role="tablist" aria-label="Review mode"><button class="mode-tab is-selected" data-mode="code" role="tab" aria-selected="true">Code review</button><button class="mode-tab" data-mode="demo" role="tab" aria-selected="false">Sample PR</button><button class="mode-tab" data-mode="github" role="tab" aria-selected="false">GitHub PR</button></div>
+            <form id="review-form">
+              <div class="form-field" id="sample-field"><label for="sample-select">SAMPLE PULL REQUEST</label><div class="select-wrap"><select id="sample-select"></select><span>⌄</span></div></div>
+              <div class="form-field" id="language-field"><label for="language-select">LANGUAGE</label><div class="select-wrap"><select id="language-select" aria-describedby="language-hint"><option value="python">Python · AST rules</option></select><span>⌄</span></div><div class="field-hint" id="language-hint">Python is currently the only language analyzer available.</div></div>
+              <div class="form-field" id="code-sample-field"><label for="code-sample-select">OPTIONAL STARTER EXAMPLE</label><div class="select-wrap"><select id="code-sample-select" aria-label="Choose a built-in Python example"><option value="">Choose an example</option></select><span>⌄</span></div></div>
+              <div class="form-field hidden" id="repo-field"><label for="repo-url">GITHUB REPOSITORY URL</label><div class="input-wrap"><span class="input-prefix">↗</span><input id="repo-url" type="url" placeholder="https://github.com/owner/repository" autocomplete="url"></div><div class="field-hint">Public repos work without a token. Private repos need a read-only token.</div></div>
+              <div class="form-field hidden" id="pr-field"><label for="pr-number">PULL REQUEST NUMBER</label><div class="input-wrap"><span class="input-prefix">#</span><input id="pr-number" type="number" min="1" placeholder="e.g. 42"></div></div>
+              <div class="form-field" id="snippet-field"><label for="code-snippet">PYTHON SOURCE CODE</label><div class="code-empty-state" id="code-empty-state"><span class="empty-state-mark">⌘</span><strong>Start with a small Python example</strong><span>Or paste your own source below. Code is parsed, never executed.</span><button class="quiet-link" id="try-sample" type="button">Load the safe sample <span>→</span></button></div><textarea id="code-snippet" rows="9" maxlength="30000" spellcheck="false" placeholder="Paste Python code here…"></textarea><div class="field-hint" id="code-editor-hint">Python AST rules · code is never executed · no AI provider required</div></div>
+              <div class="form-error hidden" id="form-error" role="alert"></div>
+              <div class="form-actions"><button class="button button-secondary" id="reset-review" type="button">Reset</button><button class="button button-primary review-submit" id="review-submit" type="submit"><span class="submit-icon">✦</span><span id="submit-label">Review Code</span><span class="button-arrow">→</span></button></div>
+            </form>
+            <div class="form-security"><span>♧</span> Read-only analysis <i></i> No code execution <i></i> No PR changes
+            </div>
+          </section>
+
+          <section class="panel activity-panel">
+            <div class="panel-heading compact"><div><div class="panel-kicker">LATEST ACTIVITY</div><h2>Recent reviews <span class="data-pill" id="activity-pill">DEMO SAMPLES</span></h2></div><button class="quiet-link" data-view="reviews">View all <span>→</span></button></div>
+            <div class="activity-list" id="activity-list"><div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div></div>
+          </section>
+        </div>
+
+        <section class="panel results-panel hidden" id="results-panel" aria-live="polite">
+          <div class="result-header"><div><div class="panel-kicker">REVIEW RESULTS <span id="result-mode" class="mode-pill">ANALYSIS</span></div><h2 id="result-title">Review findings</h2><p id="result-summary"></p></div><div class="result-score"><span id="result-score-label">ESTIMATED QUALITY</span><strong id="result-score">—</strong><small>/ 100</small></div></div>
+          <div class="result-meta" id="result-meta"></div>
+          <div class="change-summary" id="change-summary" aria-label="Files and changed lines"></div>
+          <div class="insight-grid">
+            <section class="insight-card risk-radar" aria-labelledby="risk-title"><div class="insight-heading"><div><span class="panel-kicker">EXPLAINABLE RISK RADAR</span><h3 id="risk-title">Finding severity</h3></div><span class="insight-note">Counts only · not a probability</span></div><div class="risk-bars" id="risk-bars"></div><div class="risk-legend" id="risk-legend"></div></section>
+            <section class="insight-card check-panel" aria-labelledby="checks-title"><div class="insight-heading"><div><span class="panel-kicker">TRANSPARENT ANALYSIS</span><h3 id="checks-title">Checks &amp; limits</h3></div><span class="check-method" id="check-method">—</span></div><ul class="check-list" id="check-list"></ul><div class="manual-check-title">SECURE-CODING REMINDERS · NOT SCANNED</div><ul class="manual-check-list" id="manual-check-list"></ul><p class="insight-note" id="check-limits"></p></section>
+          </div>
+          <section class="pr-files-panel hidden" id="pr-files-panel" aria-label="Pull request files"><div class="insight-heading"><div><span class="panel-kicker">PULL REQUEST SCOPE</span><h3 id="pr-files-title">Files actually returned by GitHub</h3></div></div><div class="pr-file-list" id="pr-file-list"></div></section>
+          <div class="finding-toolbar"><div class="filter-group" id="severity-filters"><button class="filter-chip active" data-filter="All">All <span id="finding-count">0</span></button><button class="filter-chip" data-filter="Critical">Critical <span data-severity-count="Critical">0</span></button><button class="filter-chip" data-filter="High">High <span data-severity-count="High">0</span></button><button class="filter-chip" data-filter="Medium">Medium <span data-severity-count="Medium">0</span></button><button class="filter-chip" data-filter="Low">Low <span data-severity-count="Low">0</span></button></div><div class="finding-actions"><label class="finding-search"><span aria-hidden="true">⌕</span><input id="finding-search" type="search" placeholder="Search findings" aria-label="Search findings"></label><button class="button button-secondary" id="export-report" type="button">↓ Export report</button></div></div>
+          <div class="result-toolbar"><div class="result-toolbar-label">CHANGED FILE DIFF</div><div class="result-tools"><label for="file-select">FILE</label><select id="file-select"></select><button class="diff-toggle" id="diff-toggle" aria-expanded="false">Show diff <span>⌄</span></button></div></div>
+          <div class="diff-view hidden" id="diff-view"></div>
+          <div class="findings-list" id="findings-list"></div>
+          <div class="empty-filter hidden" id="empty-filter">No findings match this severity filter.</div>
+          <div class="review-disclaimer"><span>ⓘ</span> Findings are review suggestions, not confirmed vulnerabilities. Recommendations are examples, not guaranteed drop-in patches. Verify in context and test before applying.</div>
+        </section>
+      </section>
+
+      <section class="page-view" id="view-reviews">
+        <div class="page-heading"><div><div class="eyebrow">YOUR WORKSPACE <span class="eyebrow-dot">●</span> REVIEW HISTORY</div><h1>Code reviews</h1><p class="subheading">Reopen locally saved code analyses, sample PR reviews, and GitHub pull request reviews.</p></div><button class="button button-primary" data-view="dashboard"><span>＋</span> Start review</button></div>
+        <div class="panel history-panel"><div class="panel-heading compact"><div><div class="panel-kicker">SAVED REVIEW RUNS</div><h2>Review history <span class="data-pill">LOCAL RECORDS</span></h2></div><div class="history-controls"><label class="history-search"><span>⌕</span><input id="history-search" type="search" placeholder="Search reviews"></label><select id="history-severity" aria-label="Filter review history by severity"><option value="All">All severities</option><option value="Critical">Critical</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option><option value="None">No findings</option></select><button class="button button-secondary" id="clear-history" type="button">Clear history</button></div></div><div class="history-table-wrap"><table class="history-table"><thead><tr><th>REVIEW</th><th>METHOD</th><th>STATUS</th><th>FINDINGS</th><th>REVIEWED</th><th></th></tr></thead><tbody id="history-body"></tbody></table></div></div>
+      </section>
+
+      <section class="page-view" id="view-settings">
+        <div class="page-heading"><div><div class="eyebrow">WORKSPACE PREFERENCES <span class="eyebrow-dot">●</span> CONFIGURATION</div><h1>Settings</h1><p class="subheading">Optional integrations run on the backend. Secrets are never sent to this browser.</p></div></div>
+        <div class="settings-grid">
+          <section class="panel setting-panel"><div class="settings-icon violet">⌘</div><div class="panel-kicker">SOURCE CONTROL</div><h2>GitHub integration</h2><p>Fetch pull request metadata and changed file patches from GitHub's REST API. Public repositories work without a token.</p><div class="setting-status"><span class="status-dot" id="github-status-dot"></span><span id="github-status-label">Checking backend…</span></div><div class="setting-help"><strong>Private repositories</strong><span>Set <code>GITHUB_TOKEN</code> in the backend environment. Grant only read access to repository contents and pull requests.</span></div><div class="setting-help"><strong>Rate limits</strong><span>Unauthenticated API requests have a low rate limit. A token increases the limit; wait for reset if GitHub returns 429.</span></div></section>
+          <section class="panel setting-panel"><div class="settings-icon blue">✳</div><div class="panel-kicker">REVIEW ENGINE</div><h2>AI review provider</h2><p>Connect an OpenAI-compatible chat completions endpoint. When no key is configured, the clearly labeled demo heuristic is used.</p><div class="setting-status"><span class="status-dot" id="ai-status-dot"></span><span id="ai-status-label">Checking backend…</span></div><div class="setting-help"><strong>Environment variables</strong><span><code>LLM_API_KEY</code>, <code>LLM_BASE_URL</code>, and <code>LLM_MODEL</code>. Never put keys in frontend files.</span></div><div class="setting-help"><strong>Privacy</strong><span>When enabled, GitHub diffs are sent to your configured provider. Review that provider's data policy before use.</span></div></section>
+          <section class="panel setting-panel wide"><div class="settings-icon orange">ⓘ</div><div class="panel-kicker">SAFETY & TRANSPARENCY</div><h2>Designed for human review</h2><div class="safety-grid"><div><strong>Untrusted input</strong><span>Repository diffs are treated as untrusted text. Submitted code is never executed.</span></div><div><strong>Advisory only</strong><span>Findings are suggestions, not confirmed vulnerabilities. No PR approvals, merges, or edits are made.</span></div><div><strong>Estimated score</strong><span>The quality score is a rough signal for demonstration, not an objective measurement.</span></div></div></section>
+        </div>
+      </section>
+      <footer class="app-footer"><span>AI Code Review Bot (GitHub PR) <span class="footer-sep">·</span> Smart pull request reviewer</span><span>Built for thoughtful code review <span class="footer-heart">✦</span></span></footer>
+    </main>
+  </div>
+  <div class="toast hidden" id="toast" role="status"></div>
+</body>
+</html>

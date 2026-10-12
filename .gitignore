@@ -1,0 +1,31 @@
+# Environments and local secrets
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# Python-generated files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Test, coverage, and tool caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Local data and logs
+backend/data/*.sqlite3
+*.log
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+.idea/

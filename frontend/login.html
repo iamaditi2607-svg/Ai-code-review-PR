@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1020">
+  <title>Sign in · AI Code Review Bot (GitHub PR)</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0b1020;--panel:#11182a;--line:#273149;--text:#edf1fb;--muted:#929db2;--purple:#9a77ff;--font:"Segoe UI",Arial,sans-serif}
+    *{box-sizing:border-box}body{min-height:100vh;margin:0;display:grid;place-items:center;padding:20px;background:radial-gradient(ellipse at 50% 10%,#232044 0,transparent 52%),var(--bg);color:var(--text);font-family:var(--font)}
+    .card{width:min(100%,390px);padding:30px;border:1px solid var(--line);border-radius:14px;background:#11182aee;box-shadow:0 20px 80px #0006}
+    .mark{width:44px;height:44px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(145deg,#926eff,#5268f2);font-size:22px}
+    h1{font-size:22px;margin:20px 0 6px;letter-spacing:-.5px}p{font-size:13px;line-height:1.6;color:var(--muted);margin:0 0 22px}
+    label{display:block;margin:14px 0 7px;font-size:11px;color:#c4cee0}
+    input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:7px;background:#0b1221;color:var(--text);font:13px var(--font);outline:none}
+    input:focus{border-color:var(--purple);box-shadow:0 0 0 3px #9a77ff25}
+    button{width:100%;margin-top:20px;padding:11px;border:0;border-radius:7px;background:linear-gradient(105deg,#8666ed,#6c70ef);color:#fff;font-weight:600;cursor:pointer}
+    button:disabled{opacity:.6;cursor:wait}.error{min-height:18px;margin-top:12px;color:#ff9ba5;font-size:12px}
+    .foot{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:10px;color:#7d899f}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="mark" aria-hidden="true">⌘</div>
+    <h1>AI Code Review Bot (GitHub PR)</h1>
+    <p>This shared project demo is password-protected. Enter the access details provided by the presenter.</p>
+    <form id="login-form" autocomplete="off">
+      <label for="username">Username</label>
+      <input id="username" name="access-user" autocomplete="off" required maxlength="100">
+      <label for="password">Password</label>
+      <input id="password" name="access-key" type="password" autocomplete="new-password" required maxlength="200">
+      <button id="submit" type="submit">Open prototype</button>
+      <div class="error" id="error" role="alert"></div>
+    </form>
+    <div class="foot">Submitted code is analyzed with local Python AST rules and is never executed.</div>
+  </main>
+  <script>
+    const form = document.querySelector("#login-form");
+    const button = document.querySelector("#submit");
+    const errorBox = document.querySelector("#error");
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      errorBox.textContent = "";
+      button.disabled = true;
+      button.textContent = "Signing in…";
+      try {
+        const response = await fetch("/api/access", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: document.querySelector("#username").value,
+            password: document.querySelector("#password").value
+          })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.detail || "Could not sign in.");
+        window.location.replace("/");
+      } catch (error) {
+        errorBox.textContent = error.message || "The server could not be reached.";
+        button.disabled = false;
+        button.textContent = "Open prototype";
+      }
+    });
+  </script>
+</body>
+</html>
