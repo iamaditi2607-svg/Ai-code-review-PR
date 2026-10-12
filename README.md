@@ -97,7 +97,7 @@ Set `LLM_API_KEY`, and optionally `LLM_BASE_URL` and `LLM_MODEL`. The server sen
 
 ## Render deployment
 
-The included [`render.yaml`](./render.yaml) defines a Python web service, installs `requirements.txt`, starts the app with `python run.py` (binding to `0.0.0.0` and using the host-provided `PORT`), and uses `/health` for its health check. The root [`Procfile`](./Procfile) provides the same startup command to hosts that use Procfiles.
+The included [`render.yaml`](./render.yaml) builds the app from the [`Dockerfile`](./Dockerfile), deploys the container on Render's free Singapore region, and uses `/health` for its health check. The container starts `run.py`, which binds to `0.0.0.0` and uses the host-provided `PORT`. The root [`Procfile`](./Procfile) provides the same startup command to hosts that use Procfiles.
 
 1. Push this project to a GitHub repository you own (see below).
 2. Sign in to Render and choose **New + → Blueprint**.

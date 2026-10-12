@@ -1,9 +1,9 @@
 services:
   - type: web
     name: ai-code-review-bot
-    runtime: python
+    runtime: docker
     plan: free
     region: singapore
-    buildCommand: pip install -r requirements.txt
-    startCommand: python run.py
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     healthCheckPath: /health
